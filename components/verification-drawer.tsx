@@ -50,14 +50,6 @@ export function VerificationDrawer({
   const router = useRouter();
   const { toast } = useToast();
 
-  console.log("🎭 VerificationDrawer render:", {
-    isOpen,
-    userId,
-    email,
-    otp,
-    isSuccess,
-  });
-
   // Countdown timer for resend button
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -69,8 +61,6 @@ export function VerificationDrawer({
 
   // FIXED: Remove form submission behavior completely
   const handleVerifyOTP = useCallback(async () => {
-    console.log("🔐 Verifying OTP:", otp);
-
     if (otp.length !== 6) {
       setError("Please enter a valid 6-digit OTP");
       return;
@@ -81,16 +71,14 @@ export function VerificationDrawer({
 
     try {
       await verifyOTP(userId, otp);
-      console.log("✅ OTP verified successfully");
-      setIsSuccess(true);
 
+      setIsSuccess(true);
       // Show success animation for 2 seconds then redirect
       setTimeout(() => {
         onSuccess?.();
       }, 2000);
       router.push("/dashboard");
     } catch (error: any) {
-      console.log("❌ OTP verification error:", error);
       setError(error.message || "OTP verification failed");
     } finally {
       setIsLoading(false);
@@ -98,20 +86,18 @@ export function VerificationDrawer({
   }, [otp, userId, verifyOTP, onSuccess]);
 
   const handleResendOTP = useCallback(async () => {
-    console.log("📨 Resending OTP for userId:", userId);
     setIsResending(true);
     setError("");
 
     try {
       await api.post("/resend-otp", { userId });
       setCountdown(60);
-      console.log("✅ OTP resent successfully");
+
       toast({
         title: "OTP Sent!",
         description: "A new verification code has been sent to your email.",
       });
     } catch (error: any) {
-      console.log("❌ Resend OTP error:", error);
       setError(error.response?.data?.message || "Failed to resend OTP");
     } finally {
       setIsResending(false);
@@ -119,7 +105,6 @@ export function VerificationDrawer({
   }, [userId, toast]);
 
   const handleClose = useCallback(() => {
-    console.log("🎭 Drawer close handler called");
     setOtp("");
     setError("");
     setIsSuccess(false);
@@ -127,10 +112,8 @@ export function VerificationDrawer({
   }, [onClose]);
 
   const handleOpenChange = useCallback((open: boolean) => {
-    console.log("🎭 Drawer open change requested:", open);
     // Prevent automatic closing entirely
     if (!open) {
-      console.log("🎭 Preventing automatic close");
       return false;
     }
   }, []);
@@ -153,9 +136,7 @@ export function VerificationDrawer({
     [handleClose]
   );
 
-  // Don't render if not open
   if (!isOpen) {
-    console.log("🎭 Drawer not open, not rendering");
     return null;
   }
 

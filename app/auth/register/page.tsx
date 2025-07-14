@@ -164,14 +164,11 @@ export default function RegisterPage() {
 
       const response = await api.post("/register", validatedData);
 
-      console.log("Register response:", response.data);
-
       if (
         response.data.success &&
         response.data.data &&
         response.data.data.isVerified === false
       ) {
-        console.log("User exists but not verified, opening drawer");
         setVerificationData({
           userId: response.data.data.userId,
           email: response.data.data.email,
@@ -185,8 +182,6 @@ export default function RegisterPage() {
         setErrors({ general: response.data.message || "Registration failed" });
       }
     } catch (error: any) {
-      console.log("Register error:", error);
-
       if (error.errors) {
         const fieldErrors: Record<string, string> = {};
         error.errors.forEach((err: any) => {
@@ -196,12 +191,8 @@ export default function RegisterPage() {
       } else {
         if (error.response?.data) {
           const responseData = error.response.data;
-          console.log("Error response data:", responseData);
 
           if (responseData.data && responseData.data.isVerified === false) {
-            console.log(
-              "User exists but not verified (from error), opening drawer"
-            );
             setVerificationData({
               userId: responseData.data.userId,
               email: responseData.data.email,

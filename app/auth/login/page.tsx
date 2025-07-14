@@ -45,54 +45,39 @@ export default function LoginPage() {
   const [showVerificationDrawer, setShowVerificationDrawer] = useState(false);
 
   const handleSubmit = useCallback(async () => {
-    console.log("🔥 LOGIN ATTEMPT STARTED");
-    console.log("Form data:", formData);
-
     setErrors({});
     setIsLoading(true);
 
     try {
-      // Validate form data
       const validatedData = loginSchema.parse(formData);
-      console.log("✅ Form validation passed");
 
-      // Make API call
-      console.log("📡 Making API call to /student/login");
       const response = await api.post("/login", {
         email: validatedData.email,
         password: validatedData.password,
       });
 
-      console.log("📨 API Response received:", response.data);
-
-      // Check for unverified user
       const responseData = response.data;
       if (responseData.success && responseData.data) {
         if (responseData.data.isVerified === false) {
-          console.log("🚨 USER NOT VERIFIED - Opening drawer");
-
-          // Set verification data
           const userData = {
             userId: responseData.data.userId,
             email: responseData.data.email,
           };
 
-          console.log("Setting verification data:", userData);
           setVerificationData(userData);
 
           // Open drawer immediately
-          console.log("🎭 Opening verification drawer");
+
           setShowVerificationDrawer(true);
 
           // Stop loading but DON'T redirect or do anything else
           setIsLoading(false);
-          console.log("✋ Stopping here - drawer should be open");
+
           return; // CRITICAL: Stop execution here
         }
 
         // If verified, proceed with login
         if (responseData.data.token) {
-          console.log("✅ User verified, proceeding with login");
           const { token } = responseData.data;
           api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
@@ -106,8 +91,6 @@ export default function LoginPage() {
         setErrors({ general: responseData.message || "Login failed" });
       }
     } catch (error: any) {
-      console.log("❌ LOGIN ERROR:", error);
-
       if (error.errors) {
         // Validation errors
         const fieldErrors: Record<string, string> = {};
@@ -118,25 +101,20 @@ export default function LoginPage() {
       } else if (error.response?.data) {
         // API errors
         const responseData = error.response.data;
-        console.log("📨 Error response data:", responseData);
 
         // Check if it's an unverified user in error response
         if (responseData.data && responseData.data.isVerified === false) {
-          console.log("🚨 USER NOT VERIFIED (from error) - Opening drawer");
-
           const userData = {
             userId: responseData.data.userId,
             email: responseData.data.email,
           };
 
-          console.log("Setting verification data from error:", userData);
           setVerificationData(userData);
 
-          console.log("🎭 Opening verification drawer from error");
           setShowVerificationDrawer(true);
 
           setIsLoading(false);
-          console.log("✋ Stopping here - drawer should be open (from error)");
+
           return; // CRITICAL: Stop execution here
         }
 
@@ -146,7 +124,6 @@ export default function LoginPage() {
       }
     } finally {
       setIsLoading(false);
-      console.log("🏁 Login attempt finished");
     }
   }, [formData, router]);
 
@@ -163,13 +140,11 @@ export default function LoginPage() {
   );
 
   const handleDrawerClose = useCallback(() => {
-    console.log("🎭 Drawer close requested");
     setShowVerificationDrawer(false);
     setVerificationData(null);
   }, []);
 
   const handleVerificationSuccess = useCallback(() => {
-    console.log("✅ Verification successful");
     setShowVerificationDrawer(false);
     setVerificationData(null);
     router.push("/dashboard");
@@ -184,14 +159,6 @@ export default function LoginPage() {
     },
     [handleSubmit]
   );
-
-  // Log current state
-  console.log("🎯 RENDER STATE:", {
-    showVerificationDrawer,
-    verificationData,
-    isLoading,
-    errors,
-  });
 
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>

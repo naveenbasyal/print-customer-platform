@@ -15,8 +15,6 @@ import {
   Menu,
   X,
   ShoppingBag,
-  Upload,
-  Settings,
   Wrench,
   LogIn,
 } from "lucide-react";
@@ -89,6 +87,7 @@ export function Navbar({ currentPage }: NavbarProps) {
                 ) {
                   return null;
                 }
+
                 const Icon = item.icon;
 
                 return (
@@ -104,10 +103,10 @@ export function Navbar({ currentPage }: NavbarProps) {
                     >
                       <Icon className="h-4 w-4 mr-2" />
                       {item.label}
-                      {item.badge && item.badge > 0 && (
-                        <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-[#3366ff] text-white">
+                      {item.badge !== undefined && item.badge > 0 && (
+                        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-[#3366ff] text-white">
                           {item.badge}
-                        </Badge>
+                        </span>
                       )}
                     </Button>
                   </Link>
