@@ -343,7 +343,7 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <Badge className="mb-6 backdrop-blur-sm bg-transparent border-accentColorLight text-[#3366ff] hover:shadow-md transition-all duration-200">
+              <Badge className="mb-6 backdrop-blur-sm bg-transparent border-accentColorLight hover:bg-transparent text-[#3366ff] hover:shadow-md transition-all duration-200">
                 <Sparkles className="h-3 w-3 mr-1" />
                 Made for Students
               </Badge>
@@ -535,7 +535,7 @@ export default function HomePage() {
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: feature.delay }}
+                transition={{ duration: 0.2, delay: 0.1 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -10, scale: 1.02 }}
                 className="group"

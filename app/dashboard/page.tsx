@@ -23,6 +23,7 @@ import {
   Home,
   LogOut,
   Wrench,
+  IndianRupee,
 } from "lucide-react";
 import Link from "next/link";
 import { ProtectedRoute } from "@/components/protected-route";
@@ -433,7 +434,7 @@ function DashboardContent() {
                         {rates && (
                           <div className="bg-gray-50 rounded-lg p-3 mb-4">
                             <div className="flex items-center space-x-1 mb-2">
-                              <DollarSign className="h-4 w-4 text-[#3366ff]" />
+                              <IndianRupee className="h-4 w-4 text-[#3366ff]" />
                               <span className="text-sm font-medium text-gray-700">
                                 Printing Rates
                               </span>
