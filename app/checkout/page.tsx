@@ -455,7 +455,7 @@ function CheckoutContent() {
                     >
                       <Label
                         htmlFor="address"
-                        className="text-sm font-medium text-gray-900 mb-2 block flex items-center"
+                        className="text-sm font-medium text-gray-900 mb-2  flex items-center"
                       >
                         <MapPin className="h-4 w-4 mr-2 text-blue-600" />
                         Delivery Address
