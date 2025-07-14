@@ -103,7 +103,7 @@ export function VerificationDrawer({
     setError("");
 
     try {
-      await api.post("/student/resend-otp", { userId });
+      await api.post("/resend-otp", { userId });
       setCountdown(60);
       console.log("✅ OTP resent successfully");
       toast({

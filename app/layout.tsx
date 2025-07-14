@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthInitializer } from "@/components/auth-initializer";
+import { Navbar } from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +29,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthInitializer />
-          {children}
+          <div className="flex flex-col">
+            <Navbar />
+            <main>{children}</main>
+          </div>
           <Toaster />
         </ThemeProvider>
       </body>

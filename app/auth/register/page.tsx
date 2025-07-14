@@ -99,7 +99,7 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingColleges, setIsLoadingColleges] = useState(false);
-  const router = useRouter();
+
   const { toast } = useToast();
 
   const [verificationData, setVerificationData] = useState<{
@@ -114,7 +114,7 @@ export default function RegisterPage() {
     setIsLoadingColleges(true);
     try {
       const response = await api.get(
-        `/student/find-colleges?state=${formData.state.toLowerCase()}&country=${formData.country.toLowerCase()}`
+        `/find-colleges?state=${formData.state.toLowerCase()}&country=${formData.country.toLowerCase()}`
       );
       setColleges(response.data.data);
 
@@ -162,12 +162,10 @@ export default function RegisterPage() {
     try {
       const validatedData = registerSchema.parse(formData);
 
-      // Make direct API call instead of using auth store
-      const response = await api.post("/student/register", validatedData);
+      const response = await api.post("/register", validatedData);
 
       console.log("Register response:", response.data);
 
-      // Check if response indicates unverified user (existing user)
       if (
         response.data.success &&
         response.data.data &&
@@ -183,7 +181,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // If registration is successful, redirect to OTP verification
       if (!response.data.success) {
         setErrors({ general: response.data.message || "Registration failed" });
       }
@@ -197,12 +194,10 @@ export default function RegisterPage() {
         });
         setErrors(fieldErrors);
       } else {
-        // Check if it's an API response error
         if (error.response?.data) {
           const responseData = error.response.data;
           console.log("Error response data:", responseData);
 
-          // Check if it's an unverified user response
           if (responseData.data && responseData.data.isVerified === false) {
             console.log(
               "User exists but not verified (from error), opening drawer"
@@ -255,7 +250,7 @@ export default function RegisterPage() {
 
   return (
     <AuroraBackground>
-      <div className="flex items-center justify-center min-h-screen w-1/2 ">
+      <div className="flex items-center justify-center min-h-screen w-full lg:w-1/2 ">
         <motion.div
           initial={{ opacity: 0.0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -630,7 +625,6 @@ export default function RegisterPage() {
         </motion.div>
       </div>
 
-      {/* Verification Drawer - Moved outside the motion div */}
       {verificationData && (
         <VerificationDrawer
           isOpen={showVerificationDrawer}

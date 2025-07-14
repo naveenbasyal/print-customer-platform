@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useCallback } from "react"
-import Link from "next/link"
-import { motion } from "framer-motion"
+import { useState, useCallback } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Upload,
   Split,
@@ -17,171 +17,151 @@ import {
   CheckCircle,
   Loader2,
   FileText,
-} from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SplitPage {
-  id: string
-  pageNumber: number
-  blob: Blob
-  name: string
+  id: string;
+  pageNumber: number;
+  blob: Blob;
+  name: string;
 }
 
 export default function SplitPdfPage() {
-  const [file, setFile] = useState<File | null>(null)
-  const [splitPages, setSplitPages] = useState<SplitPage[]>([])
-  const [isSplitting, setIsSplitting] = useState(false)
-  const [dragActive, setDragActive] = useState(false)
-  const [totalPages, setTotalPages] = useState(0)
-  const { toast } = useToast()
+  const [file, setFile] = useState<File | null>(null);
+  const [splitPages, setSplitPages] = useState<SplitPage[]>([]);
+  const [isSplitting, setIsSplitting] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const { toast } = useToast();
 
   const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true)
+      setDragActive(true);
     } else if (e.type === "dragleave") {
-      setDragActive(false)
+      setDragActive(false);
     }
-  }, [])
+  }, []);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
-      setDragActive(false)
+      e.preventDefault();
+      e.stopPropagation();
+      setDragActive(false);
 
-      const droppedFile = e.dataTransfer.files[0]
+      const droppedFile = e.dataTransfer.files[0];
 
       if (droppedFile && droppedFile.type === "application/pdf") {
-        setFile(droppedFile)
-        setSplitPages([])
+        setFile(droppedFile);
+        setSplitPages([]);
       } else {
         toast({
           title: "Invalid file type",
           description: "Please upload a PDF file only.",
           variant: "destructive",
-        })
+        });
       }
     },
-    [toast],
-  )
+    [toast]
+  );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
+    const selectedFile = e.target.files?.[0];
 
     if (selectedFile && selectedFile.type === "application/pdf") {
-      setFile(selectedFile)
-      setSplitPages([])
+      setFile(selectedFile);
+      setSplitPages([]);
     }
-  }
+  };
 
   const removeFile = () => {
-    setFile(null)
-    setSplitPages([])
-    setTotalPages(0)
-  }
+    setFile(null);
+    setSplitPages([]);
+    setTotalPages(0);
+  };
 
   const splitPdf = async () => {
-    if (!file) return
+    if (!file) return;
 
-    setIsSplitting(true)
-    setSplitPages([])
+    setIsSplitting(true);
+    setSplitPages([]);
 
     try {
       // Dynamic import to reduce bundle size
-      const { PDFDocument } = await import("pdf-lib")
+      const { PDFDocument } = await import("pdf-lib");
 
-      const arrayBuffer = await file.arrayBuffer()
-      const pdfDoc = await PDFDocument.load(arrayBuffer)
-      const pageCount = pdfDoc.getPageCount()
-      setTotalPages(pageCount)
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pageCount = pdfDoc.getPageCount();
+      setTotalPages(pageCount);
 
-      const pages: SplitPage[] = []
+      const pages: SplitPage[] = [];
 
       for (let i = 0; i < pageCount; i++) {
         // Create a new PDF document for each page
-        const newPdfDoc = await PDFDocument.create()
-        const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [i])
-        newPdfDoc.addPage(copiedPage)
+        const newPdfDoc = await PDFDocument.create();
+        const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [i]);
+        newPdfDoc.addPage(copiedPage);
 
-        const pdfBytes = await newPdfDoc.save()
-        const blob = new Blob([pdfBytes], { type: "application/pdf" })
+        const pdfBytes = await newPdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: "application/pdf" });
 
         pages.push({
           id: `page-${i + 1}`,
           pageNumber: i + 1,
           blob,
           name: `${file.name.replace(".pdf", "")}_page_${i + 1}.pdf`,
-        })
+        });
       }
 
-      setSplitPages(pages)
+      setSplitPages(pages);
       toast({
         title: "PDF split successfully!",
         description: `Created ${pageCount} separate PDF files.`,
-      })
+      });
     } catch (error) {
-      console.error("Split error:", error)
+      console.error("Split error:", error);
       toast({
         title: "Split failed",
         description: "There was an error splitting your PDF file.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSplitting(false)
+      setIsSplitting(false);
     }
-  }
+  };
 
   const downloadPage = (page: SplitPage) => {
-    const url = URL.createObjectURL(page.blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = page.name
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  }
+    const url = URL.createObjectURL(page.blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = page.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const downloadAll = () => {
     splitPages.forEach((page, index) => {
-      setTimeout(() => downloadPage(page), index * 100)
-    })
-  }
+      setTimeout(() => downloadPage(page), index * 100);
+    });
+  };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
-  }
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (
+      Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">CP</span>
-              </div>
-              <span className="font-bold text-xl text-gray-900">College Print</span>
-            </Link>
-
-            <Link
-              href="/tools"
-              className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Tools</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
@@ -207,7 +187,9 @@ export default function SplitPdfPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-blue-400"
+              dragActive
+                ? "border-blue-500 bg-blue-50"
+                : "border-gray-300 hover:border-blue-400"
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -215,9 +197,19 @@ export default function SplitPdfPage() {
             onDrop={handleDrop}
           >
             <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Upload PDF File</h3>
-            <p className="text-gray-600 mb-4">Drag and drop your PDF file here, or click to browse</p>
-            <input type="file" accept=".pdf" onChange={handleFileSelect} className="hidden" id="file-upload" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Upload PDF File
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Drag and drop your PDF file here, or click to browse
+            </p>
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handleFileSelect}
+              className="hidden"
+              id="file-upload"
+            />
             <label
               htmlFor="file-upload"
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
@@ -235,10 +227,15 @@ export default function SplitPdfPage() {
                   <FileText className="w-5 h-5 text-red-500" />
                   <div>
                     <p className="font-medium text-gray-900">{file.name}</p>
-                    <p className="text-sm text-gray-600">{formatFileSize(file.size)}</p>
+                    <p className="text-sm text-gray-600">
+                      {formatFileSize(file.size)}
+                    </p>
                   </div>
                 </div>
-                <button onClick={removeFile} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
+                <button
+                  onClick={removeFile}
+                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -279,7 +276,9 @@ export default function SplitPdfPage() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-5 h-5 text-green-500" />
-                <h3 className="text-lg font-medium text-gray-900">Split Complete ({splitPages.length} pages)</h3>
+                <h3 className="text-lg font-medium text-gray-900">
+                  Split Complete ({splitPages.length} pages)
+                </h3>
               </div>
               <button
                 onClick={downloadAll}
@@ -292,12 +291,19 @@ export default function SplitPdfPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {splitPages.map((page) => (
-                <div key={page.id} className="border border-gray-200 rounded-lg p-4">
+                <div
+                  key={page.id}
+                  className="border border-gray-200 rounded-lg p-4"
+                >
                   <div className="w-full h-32 bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
                     <FileText className="w-8 h-8 text-gray-400" />
                   </div>
-                  <p className="font-medium text-gray-900 text-sm mb-1">Page {page.pageNumber}</p>
-                  <p className="text-xs text-gray-600 mb-3">{formatFileSize(page.blob.size)}</p>
+                  <p className="font-medium text-gray-900 text-sm mb-1">
+                    Page {page.pageNumber}
+                  </p>
+                  <p className="text-xs text-gray-600 mb-3">
+                    {formatFileSize(page.blob.size)}
+                  </p>
                   <button
                     onClick={() => downloadPage(page)}
                     className="w-full inline-flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
@@ -320,7 +326,10 @@ export default function SplitPdfPage() {
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• Upload a PDF file with multiple pages</li>
                 <li>• Each page will be extracted as a separate PDF file</li>
-                <li>• All processing happens in your browser - files never leave your device</li>
+                <li>
+                  • All processing happens in your browser - files never leave
+                  your device
+                </li>
                 <li>• Download individual pages or all at once</li>
               </ul>
             </div>
@@ -328,5 +337,5 @@ export default function SplitPdfPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

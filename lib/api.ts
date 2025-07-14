@@ -1,13 +1,12 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:8001/api",
+  baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("auth-storage");
@@ -32,7 +31,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear auth data and redirect to login
       localStorage.removeItem("auth-storage");
       window.location.href = "/auth/login";
     }

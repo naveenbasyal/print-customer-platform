@@ -64,11 +64,11 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (email: string, password: string) => {
         try {
-          const response = await api.post("/student/login", {
+          const response = await api.post("/login", {
             email,
             password,
           });
-          const { userId, email: userEmail, token } = response.data.data;
+          const { token } = response.data.data;
 
           // Set token for future requests
           api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -84,7 +84,7 @@ export const useAuthStore = create<AuthState>()(
 
       register: async (data) => {
         try {
-          const response = await api.post("/student/register", data);
+          const response = await api.post("/register", data);
           return response.data.data;
         } catch (error: any) {
           throw new Error(
@@ -95,7 +95,7 @@ export const useAuthStore = create<AuthState>()(
 
       verifyOTP: async (userId: string, otp: string) => {
         try {
-          const response = await api.post("/student/verify-otp", {
+          const response = await api.post("/verify-otp", {
             userId,
             otp,
           });
@@ -117,7 +117,7 @@ export const useAuthStore = create<AuthState>()(
 
       fetchProfile: async () => {
         try {
-          const response = await api.get("/student/profile");
+          const response = await api.get("/profile");
           set({ user: response.data.data });
         } catch (error: any) {
           throw new Error(
@@ -128,7 +128,7 @@ export const useAuthStore = create<AuthState>()(
 
       changePassword: async (currentPassword: string, newPassword: string) => {
         try {
-          await api.patch("/student/change-password", {
+          await api.patch("/change-password", {
             currentPassword,
             newPassword,
           });

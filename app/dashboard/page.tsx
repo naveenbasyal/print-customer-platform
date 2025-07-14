@@ -24,6 +24,7 @@ import {
   LogOut,
   Wrench,
   IndianRupee,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { ProtectedRoute } from "@/components/protected-route";
@@ -38,7 +39,6 @@ function DashboardContent() {
   const [stationaryRates, setStationaryRates] = useState<Record<string, any>>(
     {}
   );
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchStationaries();
@@ -89,191 +89,6 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Compact Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <div className=" rounded-lg flex items-center justify-center ">
-                <Image
-                  src={"/logo.png"}
-                  alt="Logo"
-                  width={60}
-                  height={60}
-                  className="w-16 rounded-full object-cover"
-                />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-[#3366ff] to-[#5588ff] bg-clip-text text-transparent">
-                PrintHub
-              </span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1">
-              <Link href="/">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-600 hover:text-[#3366ff]"
-                >
-                  <Home className="h-4 w-4 mr-2" />
-                  Home
-                </Button>
-              </Link>
-              <Link href="/cart">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-600 hover:text-[#3366ff] relative"
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Cart
-                  {items.length > 0 && (
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-[#3366ff] text-white">
-                      {items.length}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
-              <Link href="/orders">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-600 hover:text-[#3366ff]"
-                >
-                  <Package className="h-4 w-4 mr-2" />
-                  Orders
-                </Button>
-              </Link>
-              <Link href="/tools">
-                <Button
-                  variant="ghost"
-                  className="hover:bg-[#3366ff]/10 transition-all duration-200 bg-transparent"
-                >
-                  <Wrench className="h-4 w-4 mr-2" />
-                  Tools
-                </Button>
-              </Link>
-              <Link href="/profile">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-600 hover:text-[#3366ff]"
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  Profile
-                </Button>
-              </Link>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={logout}
-                className="text-gray-600 hover:text-red-600"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            </nav>
-
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-gray-200 bg-white"
-            >
-              <div className="px-4 py-2 space-y-1">
-                <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start text-gray-600"
-                  >
-                    <Home className="h-4 w-4 mr-2" />
-                    Home
-                  </Button>
-                </Link>
-                <Link href="/cart" onClick={() => setMobileMenuOpen(false)}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start text-gray-600 relative"
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Cart
-                    {items.length > 0 && (
-                      <Badge className="ml-auto h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-[#3366ff] text-white">
-                        {items.length}
-                      </Badge>
-                    )}
-                  </Button>
-                </Link>
-                <Link href="/orders" onClick={() => setMobileMenuOpen(false)}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start text-gray-600"
-                  >
-                    <Package className="h-4 w-4 mr-2" />
-                    Orders
-                  </Button>
-                </Link>
-                <Link href="/tools">
-                  <Button
-                    variant="ghost"
-                    className="hover:bg-[#3366ff]/10 transition-all duration-200 bg-transparent"
-                  >
-                    <Wrench className="h-4 w-4 mr-2" />
-                    Tools
-                  </Button>
-                </Link>
-                <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start text-gray-600"
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    Profile
-                  </Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full justify-start text-red-600"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Welcome Section */}
@@ -313,17 +128,21 @@ function DashboardContent() {
 
           <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
+              <Link
+                href={"/cart"}
+                className="flex items-center justify-between"
+              >
                 <div>
-                  <p className="text-purple-600 text-sm font-medium">
+                  <p className="text-purple-600 text-sm gap-x-2 flex items-center font-medium">
                     Items in Cart
+                    <ExternalLink className="h-4 w-4 text-purple-600" />
                   </p>
                   <p className="text-2xl font-bold text-purple-700">
                     {items.length}
                   </p>
                 </div>
                 <ShoppingCart className="h-8 w-8 text-purple-600" />
-              </div>
+              </Link>
             </CardContent>
           </Card>
 
@@ -331,8 +150,11 @@ function DashboardContent() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-600 text-sm font-medium">
+                  <p className="text-green-600 flex items-center gap-x-2 text-sm font-medium">
                     Ready to Print
+                    {items.length > 0 && (
+                      <ExternalLink className="h-4 w-4 text-green-600" />
+                    )}
                   </p>
                   <p className="text-xl font-bold text-green-700">
                     {items.length > 0 ? "Yes!" : "Upload"}

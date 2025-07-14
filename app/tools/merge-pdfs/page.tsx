@@ -1,40 +1,54 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { Upload, FileText, Download, X, Plus, Home, ChevronRight, ArrowLeft, Eye, Trash2, Merge } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
+import { useState, useCallback } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Upload,
+  FileText,
+  Download,
+  X,
+  Plus,
+  Home,
+  ChevronRight,
+  ArrowLeft,
+  Eye,
+  Trash2,
+  Merge,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 interface PdfFile {
-  file: File
-  id: string
-  name: string
-  size: string
+  file: File;
+  id: string;
+  name: string;
+  size: string;
 }
 
 export default function MergePdfsPage() {
-  const [pdfs, setPdfs] = useState<PdfFile[]>([])
-  const [isMerging, setIsMerging] = useState(false)
-  const [mergedPdfUrl, setMergedPdfUrl] = useState<string | null>(null)
-  const { toast } = useToast()
+  const [pdfs, setPdfs] = useState<PdfFile[]>([]);
+  const [isMerging, setIsMerging] = useState(false);
+  const [mergedPdfUrl, setMergedPdfUrl] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
-  }
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (
+      Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+    );
+  };
 
   const handleFileUpload = useCallback(
     (files: FileList | null) => {
-      if (!files) return
+      if (!files) return;
 
-      const newPdfs: PdfFile[] = []
+      const newPdfs: PdfFile[] = [];
 
       Array.from(files).forEach((file) => {
         if (file.type === "application/pdf") {
@@ -43,42 +57,42 @@ export default function MergePdfsPage() {
             id: Math.random().toString(36).substr(2, 9),
             name: file.name,
             size: formatFileSize(file.size),
-          })
+          });
         }
-      })
+      });
 
       if (newPdfs.length === 0) {
         toast({
           title: "Invalid files",
           description: "Please select only PDF files.",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
-      setPdfs((prev) => [...prev, ...newPdfs])
+      setPdfs((prev) => [...prev, ...newPdfs]);
     },
-    [toast],
-  )
+    [toast]
+  );
 
   const removePdf = (id: string) => {
-    setPdfs((prev) => prev.filter((pdf) => pdf.id !== id))
-  }
+    setPdfs((prev) => prev.filter((pdf) => pdf.id !== id));
+  };
 
   const movePdf = (id: string, direction: "up" | "down") => {
     setPdfs((prev) => {
-      const index = prev.findIndex((pdf) => pdf.id === id)
-      if (index === -1) return prev
+      const index = prev.findIndex((pdf) => pdf.id === id);
+      if (index === -1) return prev;
 
-      const newIndex = direction === "up" ? index - 1 : index + 1
-      if (newIndex < 0 || newIndex >= prev.length) return prev
+      const newIndex = direction === "up" ? index - 1 : index + 1;
+      if (newIndex < 0 || newIndex >= prev.length) return prev;
 
-      const newPdfs = [...prev]
-      const [movedPdf] = newPdfs.splice(index, 1)
-      newPdfs.splice(newIndex, 0, movedPdf)
-      return newPdfs
-    })
-  }
+      const newPdfs = [...prev];
+      const [movedPdf] = newPdfs.splice(index, 1);
+      newPdfs.splice(newIndex, 0, movedPdf);
+      return newPdfs;
+    });
+  };
 
   const mergePdfs = async () => {
     if (pdfs.length < 2) {
@@ -86,94 +100,77 @@ export default function MergePdfsPage() {
         title: "Not enough files",
         description: "Please upload at least 2 PDF files to merge.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsMerging(true)
+    setIsMerging(true);
 
     try {
       // Dynamic import to reduce bundle size
-      const { PDFDocument } = await import("pdf-lib")
+      const { PDFDocument } = await import("pdf-lib");
 
-      const mergedPdf = await PDFDocument.create()
+      const mergedPdf = await PDFDocument.create();
 
       for (const pdfFile of pdfs) {
-        const arrayBuffer = await pdfFile.file.arrayBuffer()
-        const pdf = await PDFDocument.load(arrayBuffer)
-        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices())
-        copiedPages.forEach((page) => mergedPdf.addPage(page))
+        const arrayBuffer = await pdfFile.file.arrayBuffer();
+        const pdf = await PDFDocument.load(arrayBuffer);
+        const copiedPages = await mergedPdf.copyPages(
+          pdf,
+          pdf.getPageIndices()
+        );
+        copiedPages.forEach((page) => mergedPdf.addPage(page));
       }
 
-      const pdfBytes = await mergedPdf.save()
-      const blob = new Blob([pdfBytes], { type: "application/pdf" })
-      const url = URL.createObjectURL(blob)
-      setMergedPdfUrl(url)
+      const pdfBytes = await mergedPdf.save();
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      setMergedPdfUrl(url);
 
       toast({
         title: "Merge successful!",
         description: `${pdfs.length} PDF files merged successfully.`,
-      })
+      });
     } catch (error) {
-      console.error("Merge error:", error)
+      console.error("Merge error:", error);
       toast({
         title: "Merge failed",
         description: "There was an error merging your PDFs. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsMerging(false)
+      setIsMerging(false);
     }
-  }
+  };
 
   const downloadMergedPdf = () => {
     if (mergedPdfUrl) {
-      const a = document.createElement("a")
-      a.href = mergedPdfUrl
-      a.download = `merged-pdf-${Date.now()}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+      const a = document.createElement("a");
+      a.href = mergedPdfUrl;
+      a.download = `merged-pdf-${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
-  }
+  };
 
   const resetMerger = () => {
-    setPdfs([])
+    setPdfs([]);
     if (mergedPdfUrl) {
-      URL.revokeObjectURL(mergedPdfUrl)
-      setMergedPdfUrl(null)
+      URL.revokeObjectURL(mergedPdfUrl);
+      setMergedPdfUrl(null);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">CP</span>
-                </div>
-                <span className="font-semibold text-gray-900">College Print</span>
-              </Link>
-            </div>
-
-            <Button asChild variant="outline" size="sm">
-              <Link href="/tools">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Tools
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
-          <Link href="/dashboard" className="hover:text-blue-600 transition-colors flex items-center">
+          <Link
+            href="/dashboard"
+            className="hover:text-blue-600 transition-colors flex items-center"
+          >
             <Home className="w-4 h-4 mr-1" />
             Dashboard
           </Link>
@@ -228,14 +225,18 @@ export default function MergePdfsPage() {
                   className="text-center cursor-pointer"
                   onClick={() => document.getElementById("pdf-upload")?.click()}
                   onDrop={(e) => {
-                    e.preventDefault()
-                    handleFileUpload(e.dataTransfer.files)
+                    e.preventDefault();
+                    handleFileUpload(e.dataTransfer.files);
                   }}
                   onDragOver={(e) => e.preventDefault()}
                 >
                   <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload PDF Files</h3>
-                  <p className="text-gray-600 mb-4">Drag and drop your PDF files here, or click to browse</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Upload PDF Files
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Drag and drop your PDF files here, or click to browse
+                  </p>
                   <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                     <Plus className="w-4 h-4 mr-2" />
                     Choose PDFs
@@ -256,7 +257,11 @@ export default function MergePdfsPage() {
 
         {/* PDF List */}
         {pdfs.length > 0 && !mergedPdfUrl && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <Card className="mb-8">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -273,12 +278,17 @@ export default function MergePdfsPage() {
               <CardContent>
                 <div className="space-y-3 mb-6">
                   {pdfs.map((pdf, index) => (
-                    <div key={pdf.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div
+                      key={pdf.id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    >
                       <div className="flex items-center space-x-3">
                         <Badge variant="secondary">{index + 1}</Badge>
                         <FileText className="w-5 h-5 text-red-500" />
                         <div>
-                          <p className="font-medium text-gray-900 truncate max-w-xs">{pdf.name}</p>
+                          <p className="font-medium text-gray-900 truncate max-w-xs">
+                            {pdf.name}
+                          </p>
                           <p className="text-sm text-gray-500">{pdf.size}</p>
                         </div>
                       </div>
@@ -342,14 +352,22 @@ export default function MergePdfsPage() {
 
         {/* Download Section */}
         {mergedPdfUrl && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <Card className="text-center">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Download className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">PDF Merged Successfully!</h3>
-                <p className="text-gray-600 mb-6">Your PDF files have been merged into a single document</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  PDF Merged Successfully!
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Your PDF files have been merged into a single document
+                </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
                     onClick={downloadMergedPdf}
@@ -368,5 +386,5 @@ export default function MergePdfsPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

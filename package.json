@@ -57,7 +57,7 @@
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^5.3.93",
     "react": "^18",
-    "react-day-picker": "8.10.1",
+    "react-day-picker": "^9.8.0",
     "react-dom": "^18",
     "react-dropzone": "latest",
     "react-hook-form": "^7.54.1",
@@ -67,7 +67,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "use-sync-external-store": "latest",
-    "vaul": "^0.9.6",
+    "vaul": "^1.1.2",
     "xlsx": "^0.18.5",
     "zod": "latest",
     "zustand": "latest"

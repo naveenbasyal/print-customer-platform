@@ -73,7 +73,7 @@ export const useOrderStore = create<OrderState>((set) => ({
   fetchOrders: async () => {
     set({ isLoading: true });
     try {
-      const response = await api.get("/student/orders");
+      const response = await api.get("/orders");
       set({ orders: response.data.data });
     } catch (error: any) {
       console.error("Failed to fetch orders:", error);
@@ -84,7 +84,7 @@ export const useOrderStore = create<OrderState>((set) => ({
 
   createOrder: async (data: CreateOrderData) => {
     try {
-      const response = await api.post("/student/create-order", data);
+      const response = await api.post("/create-order", data);
       return response.data.data;
     } catch (error: any) {
       throw new Error(

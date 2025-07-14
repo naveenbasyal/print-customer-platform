@@ -53,7 +53,7 @@ export const useCartStore = create<CartState>()(
       fetchCartItems: async () => {
         set({ isLoading: true });
         try {
-          const response = await api.get("/student/cart");
+          const response = await api.get("/cart");
           set({ items: response.data.data });
         } catch (error: any) {
           console.error("Failed to fetch cart items:", error);
@@ -83,7 +83,7 @@ export const useCartStore = create<CartState>()(
 
           formData.append("metadata", JSON.stringify(metadata));
 
-          await api.post("/student/upload", formData, {
+          await api.post("/upload", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
@@ -98,7 +98,7 @@ export const useCartStore = create<CartState>()(
 
       removeItem: async (itemId: string) => {
         try {
-          await api.delete(`/student/cart/${itemId}`);
+          await api.delete(`/cart/${itemId}`);
           set({ items: get().items.filter((item) => item.id !== itemId) });
         } catch (error: any) {
           throw new Error(

@@ -1,54 +1,65 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { Upload, FileImage, Download, X, Plus, Home, ChevronRight, ArrowLeft, Eye, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
+import { useState, useCallback } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Upload,
+  FileImage,
+  Download,
+  X,
+  Plus,
+  Home,
+  ChevronRight,
+  ArrowLeft,
+  Eye,
+  Trash2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 interface ImageFile {
-  file: File
-  preview: string
-  id: string
+  file: File;
+  preview: string;
+  id: string;
 }
 
 export default function JpgToPdfPage() {
-  const [images, setImages] = useState<ImageFile[]>([])
-  const [isConverting, setIsConverting] = useState(false)
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
-  const { toast } = useToast()
+  const [images, setImages] = useState<ImageFile[]>([]);
+  const [isConverting, setIsConverting] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const handleFileUpload = useCallback((files: FileList | null) => {
-    if (!files) return
+    if (!files) return;
 
-    const newImages: ImageFile[] = []
+    const newImages: ImageFile[] = [];
 
     Array.from(files).forEach((file) => {
       if (file.type.startsWith("image/")) {
-        const preview = URL.createObjectURL(file)
+        const preview = URL.createObjectURL(file);
         newImages.push({
           file,
           preview,
           id: Math.random().toString(36).substr(2, 9),
-        })
+        });
       }
-    })
+    });
 
-    setImages((prev) => [...prev, ...newImages])
-  }, [])
+    setImages((prev) => [...prev, ...newImages]);
+  }, []);
 
   const removeImage = (id: string) => {
     setImages((prev) => {
-      const imageToRemove = prev.find((img) => img.id === id)
+      const imageToRemove = prev.find((img) => img.id === id);
       if (imageToRemove) {
-        URL.revokeObjectURL(imageToRemove.preview)
+        URL.revokeObjectURL(imageToRemove.preview);
       }
-      return prev.filter((img) => img.id !== id)
-    })
-  }
+      return prev.filter((img) => img.id !== id);
+    });
+  };
 
   const convertToPdf = async () => {
     if (images.length === 0) {
@@ -56,125 +67,106 @@ export default function JpgToPdfPage() {
         title: "No images selected",
         description: "Please upload at least one image to convert.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsConverting(true)
+    setIsConverting(true);
 
     try {
       // Dynamic import to reduce bundle size
-      const { jsPDF } = await import("jspdf")
-      const pdf = new jsPDF()
+      const { jsPDF } = await import("jspdf");
+      const pdf = new jsPDF();
 
       for (let i = 0; i < images.length; i++) {
-        const image = images[i]
+        const image = images[i];
 
         // Create image element to get dimensions
-        const img = new Image()
-        img.crossOrigin = "anonymous"
+        const img = new Image();
+        img.crossOrigin = "anonymous";
 
         await new Promise((resolve, reject) => {
-          img.onload = resolve
-          img.onerror = reject
-          img.src = image.preview
-        })
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = image.preview;
+        });
 
         // Calculate dimensions to fit page
-        const pageWidth = pdf.internal.pageSize.getWidth()
-        const pageHeight = pdf.internal.pageSize.getHeight()
-        const imgAspectRatio = img.width / img.height
-        const pageAspectRatio = pageWidth / pageHeight
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgAspectRatio = img.width / img.height;
+        const pageAspectRatio = pageWidth / pageHeight;
 
-        let imgWidth, imgHeight
+        let imgWidth, imgHeight;
 
         if (imgAspectRatio > pageAspectRatio) {
-          imgWidth = pageWidth - 20 // 10px margin on each side
-          imgHeight = imgWidth / imgAspectRatio
+          imgWidth = pageWidth - 20; // 10px margin on each side
+          imgHeight = imgWidth / imgAspectRatio;
         } else {
-          imgHeight = pageHeight - 20 // 10px margin on top and bottom
-          imgWidth = imgHeight * imgAspectRatio
+          imgHeight = pageHeight - 20; // 10px margin on top and bottom
+          imgWidth = imgHeight * imgAspectRatio;
         }
 
-        const x = (pageWidth - imgWidth) / 2
-        const y = (pageHeight - imgHeight) / 2
+        const x = (pageWidth - imgWidth) / 2;
+        const y = (pageHeight - imgHeight) / 2;
 
         if (i > 0) {
-          pdf.addPage()
+          pdf.addPage();
         }
 
-        pdf.addImage(img, "JPEG", x, y, imgWidth, imgHeight)
+        pdf.addImage(img, "JPEG", x, y, imgWidth, imgHeight);
       }
 
-      const pdfBlob = pdf.output("blob")
-      const url = URL.createObjectURL(pdfBlob)
-      setPdfUrl(url)
+      const pdfBlob = pdf.output("blob");
+      const url = URL.createObjectURL(pdfBlob);
+      setPdfUrl(url);
 
       toast({
         title: "Conversion successful!",
         description: `${images.length} image(s) converted to PDF.`,
-      })
+      });
     } catch (error) {
-      console.error("Conversion error:", error)
+      console.error("Conversion error:", error);
       toast({
         title: "Conversion failed",
-        description: "There was an error converting your images. Please try again.",
+        description:
+          "There was an error converting your images. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsConverting(false)
+      setIsConverting(false);
     }
-  }
+  };
 
   const downloadPdf = () => {
     if (pdfUrl) {
-      const a = document.createElement("a")
-      a.href = pdfUrl
-      a.download = `converted-images-${Date.now()}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+      const a = document.createElement("a");
+      a.href = pdfUrl;
+      a.download = `converted-images-${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
-  }
+  };
 
   const resetConverter = () => {
-    images.forEach((img) => URL.revokeObjectURL(img.preview))
-    setImages([])
+    images.forEach((img) => URL.revokeObjectURL(img.preview));
+    setImages([]);
     if (pdfUrl) {
-      URL.revokeObjectURL(pdfUrl)
-      setPdfUrl(null)
+      URL.revokeObjectURL(pdfUrl);
+      setPdfUrl(null);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">CP</span>
-                </div>
-                <span className="font-semibold text-gray-900">College Print</span>
-              </Link>
-            </div>
-
-            <Button asChild variant="outline" size="sm">
-              <Link href="/tools">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Tools
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
-          <Link href="/dashboard" className="hover:text-blue-600 transition-colors flex items-center">
+          <Link
+            href="/dashboard"
+            className="hover:text-blue-600 transition-colors flex items-center"
+          >
             <Home className="w-4 h-4 mr-1" />
             Dashboard
           </Link>
@@ -227,16 +219,22 @@ export default function JpgToPdfPage() {
               <CardContent className="p-8">
                 <div
                   className="text-center cursor-pointer"
-                  onClick={() => document.getElementById("file-upload")?.click()}
+                  onClick={() =>
+                    document.getElementById("file-upload")?.click()
+                  }
                   onDrop={(e) => {
-                    e.preventDefault()
-                    handleFileUpload(e.dataTransfer.files)
+                    e.preventDefault();
+                    handleFileUpload(e.dataTransfer.files);
                   }}
                   onDragOver={(e) => e.preventDefault()}
                 >
                   <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Images</h3>
-                  <p className="text-gray-600 mb-4">Drag and drop your JPG images here, or click to browse</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Upload Images
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Drag and drop your JPG images here, or click to browse
+                  </p>
                   <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                     <Plus className="w-4 h-4 mr-2" />
                     Choose Files
@@ -257,7 +255,11 @@ export default function JpgToPdfPage() {
 
         {/* Image Preview */}
         {images.length > 0 && !pdfUrl && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <Card className="mb-8">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -280,7 +282,9 @@ export default function JpgToPdfPage() {
                         alt={`Preview ${index + 1}`}
                         className="w-full h-24 object-cover rounded-lg border"
                       />
-                      <Badge className="absolute top-2 left-2 text-xs">{index + 1}</Badge>
+                      <Badge className="absolute top-2 left-2 text-xs">
+                        {index + 1}
+                      </Badge>
                       <Button
                         size="sm"
                         variant="destructive"
@@ -319,14 +323,22 @@ export default function JpgToPdfPage() {
 
         {/* Download Section */}
         {pdfUrl && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <Card className="text-center">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Download className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">PDF Ready!</h3>
-                <p className="text-gray-600 mb-6">Your images have been successfully converted to PDF</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  PDF Ready!
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Your images have been successfully converted to PDF
+                </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
                     onClick={downloadPdf}
@@ -345,5 +357,5 @@ export default function JpgToPdfPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

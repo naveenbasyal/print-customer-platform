@@ -58,7 +58,7 @@ export default function LoginPage() {
 
       // Make API call
       console.log("📡 Making API call to /student/login");
-      const response = await api.post("/student/login", {
+      const response = await api.post("/login", {
         email: validatedData.email,
         password: validatedData.password,
       });

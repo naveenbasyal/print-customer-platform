@@ -40,7 +40,7 @@ export const useStationaryStore = create<StationaryState>((set) => ({
   fetchStationaries: async () => {
     set({ isLoading: true });
     try {
-      const response = await api.get("/student/get-stationaries");
+      const response = await api.get("/get-stationaries");
       set({ stationaries: response.data.data });
     } catch (error: any) {
       console.error("Failed to fetch stationaries:", error);
@@ -53,7 +53,7 @@ export const useStationaryStore = create<StationaryState>((set) => ({
     try {
       try {
         const response = await api.get(
-          `/student/printing-rates?stationaryId=${stationaryId}`
+          `/printing-rates?stationaryId=${stationaryId}`
         );
         set({ printingRates: response.data.data });
         return;
@@ -61,7 +61,7 @@ export const useStationaryStore = create<StationaryState>((set) => ({
         // If GET with query params fails, try POST with body
         if (error.response?.status === 404 || error.response?.status === 405) {
           try {
-            const response = await api.post("/student/printing-rates", {
+            const response = await api.post("/printing-rates", {
               stationaryId,
             });
             set({ printingRates: response.data.data });
@@ -72,7 +72,7 @@ export const useStationaryStore = create<StationaryState>((set) => ({
               postError.response?.status === 404 ||
               postError.response?.status === 405
             ) {
-              const response = await api.get("/student/printing-rates", {
+              const response = await api.get("/printing-rates", {
                 data: { stationaryId },
               });
               set({ printingRates: response.data.data });

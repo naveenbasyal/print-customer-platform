@@ -49,7 +49,7 @@ const tools = [
     icon: FileImage,
     category: "image",
     color: "from-green-500 to-green-600",
-    available: true,
+    available: false,
   },
   {
     id: "merge-pdfs",
@@ -158,7 +158,7 @@ export default function ToolsPage() {
   const comingSoonCount = tools.filter((tool) => !tool.available).length;
 
   const categories = [
-    { id: "all", name: "All Tools", count: tools.length },
+    { id: "all", name: "All Tools", count: availableTools.length },
     {
       id: "image",
       name: "Image",
@@ -183,190 +183,6 @@ export default function ToolsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      {/* Compact Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2">
-              <div className=" rounded-lg flex items-center justify-center ">
-                <Image
-                  src={"/logo.png"}
-                  alt="Logo"
-                  width={60}
-                  height={60}
-                  className="w-16 rounded-full object-cover"
-                />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-[#3366ff] to-[#5588ff] bg-clip-text text-transparent">
-                PrintHub
-              </span>
-            </Link>
-
-            {user && (
-              <nav className="hidden md:flex items-center space-x-1">
-                <Link href="/">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600 hover:text-[#3366ff]"
-                  >
-                    <Home className="h-4 w-4 mr-2" />
-                    Home
-                  </Button>
-                </Link>
-                <Link href="/dashboard">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600 hover:text-[#3366ff]"
-                  >
-                    <Package className="h-4 w-4 mr-2" />
-                    Dashboard
-                  </Button>
-                </Link>
-                <Link href="/profile">
-                  <Button
-                    variant="ghost"
-                    className="hover:bg-[#3366ff]/10 transition-all duration-200 bg-transparent"
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    Profile
-                  </Button>
-                </Link>
-                <Link href="/cart">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600 hover:text-[#3366ff]"
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Cart
-                  </Button>
-                </Link>
-                <Link href="/orders">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600 hover:text-[#3366ff]"
-                  >
-                    <Package className="h-4 w-4 mr-2" />
-                    Orders
-                  </Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={logout}
-                  className="text-gray-600 hover:text-red-600"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </nav>
-            )}
-
-            {/* Mobile Menu Button */}
-            {user && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="md:hidden"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <Menu className="h-5 w-5" />
-                )}
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {user && (
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="md:hidden border-t border-gray-200 bg-white"
-              >
-                <div className="px-4 py-2 space-y-1">
-                  <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-gray-600"
-                    >
-                      <Home className="h-4 w-4 mr-2" />
-                      Home
-                    </Button>
-                  </Link>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-gray-600"
-                    >
-                      <Package className="h-4 w-4 mr-2" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <Link href="/profile">
-                    <Button
-                      variant="ghost"
-                      className="hover:bg-gray-100 transition-all duration-200"
-                    >
-                      <User className="h-4 w-4 mr-2" />
-                      Profile
-                    </Button>
-                  </Link>
-                  <Link href="/cart" onClick={() => setMobileMenuOpen(false)}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-gray-600"
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Cart
-                    </Button>
-                  </Link>
-                  <Link href="/orders" onClick={() => setMobileMenuOpen(false)}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-gray-600"
-                    >
-                      <Package className="h-4 w-4 mr-2" />
-                      Orders
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      logout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full justify-start text-red-600"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        )}
-      </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
