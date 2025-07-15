@@ -276,7 +276,7 @@ export default function RegisterPage() {
               transition={{ delay: 0.7 }}
               className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
             >
-              Join PrintHub
+              Join Walldeed
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}

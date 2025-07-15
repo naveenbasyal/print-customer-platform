@@ -28,6 +28,7 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import Image from "next/image";
+import Script from "next/script";
 
 export default function HomePage() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -64,6 +65,24 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white overflow-hidden">
+      <Script
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "Walldeed",
+            url: "https://walldeed.vercel.app",
+            author: {
+              "@type": "Person",
+              name: "Naveen Basyal & Puneet Sharma",
+            },
+            description:
+              "Walldeed is a smart online platform to upload, convert, and print documents at your nearby print shop. Designed for students and working professionals.",
+          }),
+        }}
+      />
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
         {/* Background Elements */}
@@ -207,7 +226,7 @@ export default function HomePage() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Students Love PrintHub
+              Why Students Love Walldeed
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Everything you need for hassle-free printing, designed
@@ -433,7 +452,7 @@ export default function HomePage() {
               Ready to Start Printing?
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Join thousands of students who trust PrintHub for their printing
+              Join thousands of students who trust Walldeed for their printing
               needs.
             </p>
             {isAuthenticated ? (
@@ -486,10 +505,10 @@ export default function HomePage() {
               <div className="w-8 h-8 bg-gradient-to-r from-[#3366ff] to-[#5588ff] rounded-lg flex items-center justify-center">
                 <Printer className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold">PrintHub</span>
+              <span className="text-xl font-bold">Walldeed</span>
             </div>
             <div className="flex items-center space-x-4 text-gray-400">
-              <span>© 2024 PrintHub. Made with ❤️ for students.</span>
+              <span>© 2024 Walldeed. Made with ❤️ for students.</span>
               <div className="flex items-center space-x-1">
                 <CheckCircle className="h-4 w-4 text-green-400" />
                 <span className="text-sm">Trusted & Secure</span>

@@ -184,7 +184,7 @@ export function VerificationDrawer({
             </DrawerTitle>
             <DrawerDescription className="text-gray-600 dark:text-gray-400">
               {isSuccess
-                ? "Welcome to PrintHub! Redirecting to dashboard..."
+                ? "Welcome to Walldeed! Redirecting to dashboard..."
                 : `We've sent a 6-digit code to ${email}`}
             </DrawerDescription>
           </DrawerHeader>

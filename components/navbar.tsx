@@ -71,7 +71,7 @@ export function Navbar({ currentPage }: NavbarProps) {
               />
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-[#3366ff] to-[#5588ff] bg-clip-text text-transparent">
-              PrintHub
+              Walldeed
             </span>
           </Link>
 

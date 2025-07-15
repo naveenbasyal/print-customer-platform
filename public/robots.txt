@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://walldeed.vercel.app/sitemap.xml

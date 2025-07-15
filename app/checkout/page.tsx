@@ -149,7 +149,7 @@ function CheckoutContent() {
         key: "rzp_test_yQG26LZF4tUxWj",
         amount: orderData.newPayment.amountInPaise,
         currency: "INR",
-        name: "PrintHub",
+        name: "Walldeed",
         description: "Print Order Payment",
         order_id: orderData.newPayment.order.id,
         handler: async (response: any) => {
