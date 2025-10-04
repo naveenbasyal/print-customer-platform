@@ -121,7 +121,7 @@ export default function RegisterPage() {
       if (response.data.data.length === 0) {
         toast({
           title: "No colleges found",
-          description: `No colleges found in ${formData.state}, ${formData.country}. Please try a different location.`,
+          description: `No colleges found in ${formData.state}, ${formData.country}. Please try Punjab for demo.`,
           variant: "destructive",
         });
       } else {
